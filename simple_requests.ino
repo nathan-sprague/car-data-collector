@@ -2,6 +2,13 @@
 
 
 #define USE_AP true
+#include "max6675.h"
+ 
+int thermoDO = 19;
+int thermoCS = 23;
+int thermoCLK = 5;
+ 
+MAX6675 thermocouple(thermoCLK, thermoCS, thermoDO);
 
 
 
@@ -50,7 +57,7 @@ void setup() {
     
   } else {
       WiFi.mode(WIFI_STA);
-      WiFi.begin("CW-104", "deny bunch cycle");
+      WiFi.begin("ssid", "pwd");
       while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
@@ -86,7 +93,7 @@ void setup() {
 }
 
 float getReading(){
-  return 1.01;
+  return thermocouple.readFahrenheit();
 }
 
 void loop() {

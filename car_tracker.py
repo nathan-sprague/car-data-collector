@@ -42,22 +42,24 @@ def setupCan(canSpeed):
 
 def receiveMessage():
     global bus
-    message = bus.recv() # Wait until a message is received.
-    
-    c = '{0:f} {1:x} {2:x} '.format(message.timestamp, message.arbitration_id, message.dlc)
+    while True:
+        message = bus.recv() # Wait until a message is received.
+        
+        c = '{0:f} {1:x} {2:x} '.format(message.timestamp, message.arbitration_id, message.dlc)
 
-    with open("canData.txt", 'a+') as fileHandle:
-        fileHandle.write(str(c) + "\n")
-        fileHandle.close()
-    return message
+        with open("canData.txt", 'a+') as fileHandle:
+            fileHandle.write(str(c) + str(message.data) + "\n")
+            fileHandle.close()
+    # return message
 
 def endCan():
     os.system("sudo /sbin/ip link set can0 down")
     print("can ended")
 
 
+
 if importedCan:
-    bus = canManager.setupCan(500000)
+    bus = setupCan(500000)
     thread1 = Thread(target=recieveMessage)
     thread2 = Thread(target=logTemp)
 
@@ -67,5 +69,3 @@ if importedCan:
 
     thread1.join()
     thread2.join()
-
-

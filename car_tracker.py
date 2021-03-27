@@ -45,10 +45,16 @@ def receiveMessage():
     while True:
         message = bus.recv() # Wait until a message is received.
         
-        c = '{0:f} {1:x} {2:x} '.format(message.timestamp, message.arbitration_id, message.dlc)
+        # c = '{0:f} {1:x} {2:x} '.format(message.timestamp, message.arbitration_id, message.dlc)
+        s = str(message.timestamp)
+        s += ", " + message.arbitration_id
+   
+        for i in range(message.dlc):
+           s += str(hex(message.data[i]))
+        print(s)
 
         with open("canData.txt", 'a+') as fileHandle:
-            fileHandle.write(str(c) + str(message.data) + "\n")
+            fileHandle.write(str(s) + "\n")
             fileHandle.close()
     # return message
 
@@ -60,12 +66,13 @@ def endCan():
 
 if importedCan:
     bus = setupCan(500000)
-    thread1 = Thread(target=recieveMessage)
-    thread2 = Thread(target=logTemp)
+    if bus != False:
+	    thread1 = Thread(target=receiveMessage)
+	    thread2 = Thread(target=logTemp)
 
-    thread1.start()
-    thread2.start()
-    time.sleep(1)
+	    thread1.start()
+	    thread2.start()
+	    time.sleep(1)
 
-    thread1.join()
-    thread2.join()
+	    thread1.join()
+	    thread2.join()
